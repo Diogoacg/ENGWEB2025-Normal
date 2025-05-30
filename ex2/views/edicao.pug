@@ -1,0 +1,60 @@
+doctype html
+html(lang="pt")
+  head
+    meta(charset="UTF-8")
+    meta(name="viewport", content="width=device-width, initial-scale=1.0")
+    title Eurovision #{edicao.ano}
+    link(rel="stylesheet", href="/stylesheets/style.css")
+  body
+    .w3-container.w3-indigo
+      h1.w3-center Eurovision Song Contest #{edicao.ano}
+      .w3-center
+        a.w3-button.w3-white.w3-text-indigo.w3-hover-light-blue(href="/") ← Voltar à página principal
+
+    .w3-container.w3-margin-top
+      h2.w3-text-indigo Edição: #{edicao.id}
+      
+      .w3-card.w3-white.w3-padding
+        .w3-row-padding
+          .w3-col.l6.m12.s12.w3-margin-bottom
+            .w3-panel.w3-leftbar.w3-light-blue.w3-padding-16
+              h4.w3-text-indigo Ano:
+              p #{edicao.ano || 'N/A'}
+          .w3-col.l6.m12.s12.w3-margin-bottom
+            .w3-panel.w3-leftbar.w3-light-blue.w3-padding-16
+              h4.w3-text-indigo País Organizador:
+              p
+                if edicao.organizacao
+                  a.w3-text-indigo(href=`/paises/${encodeURIComponent(edicao.organizacao)}`) #{edicao.organizacao}
+                else
+                  | N/A
+          .w3-col.l6.m12.s12.w3-margin-bottom
+            .w3-panel.w3-leftbar.w3-light-blue.w3-padding-16
+              h4.w3-text-indigo País Vencedor:
+              p
+                if edicao.vencedor
+                  a.w3-text-indigo(href=`/paises/${encodeURIComponent(edicao.vencedor)}`) #{edicao.vencedor}
+                else
+                  | N/A
+      
+      if edicao.musicas && edicao.musicas.length > 0
+        h3.w3-text-indigo Lista de Músicas
+        table.w3-table-all.w3-hoverable.w3-card
+          thead
+            tr.w3-indigo
+              th Música
+              th Intérprete
+              th País
+          tbody
+            each musica in edicao.musicas
+              tr
+                td #{musica.título || 'N/A'}
+                td #{musica.intérprete || 'N/A'}
+                td
+                  if musica.país
+                    a.w3-text-indigo(href=`/paises/${encodeURIComponent(musica.país)}`) #{musica.país}
+                  else
+                    | N/A
+      else
+        .w3-panel.w3-pale-yellow
+          p Não há informação sobre músicas nesta edição.

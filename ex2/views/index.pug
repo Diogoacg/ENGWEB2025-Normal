@@ -1,0 +1,40 @@
+doctype html
+html(lang="pt")
+  head
+    meta(charset="UTF-8")
+    meta(name="viewport", content="width=device-width, initial-scale=1.0")
+    title Eurovision Song Contest - Histórico
+    link(rel="stylesheet", href="/stylesheets/style.css")
+  body
+    .w3-container.w3-indigo
+      h1.w3-center Eurovision Song Contest
+      p.w3-center Arquivo histórico das edições do Eurovision Song Contest
+      p.w3-center Total de edições: #{edicoes.length}
+
+    .w3-container.w3-margin-top
+      h2.w3-text-indigo Lista de Edições
+      
+      .w3-responsive
+        table.w3-table-all.w3-hoverable.w3-card
+          thead
+            tr.w3-indigo
+              th ID Edição
+              th Ano
+              th País Organizador
+              th País Vencedor
+          tbody
+            each edicao in edicoes
+              tr
+                td
+                  a.w3-text-indigo(href=`/${edicao.id}`) #{edicao.id}
+                td #{edicao.anoEdição || 'N/A'}
+                td
+                  if edicao.organizador
+                    a.w3-text-indigo(href=`/paises/${encodeURIComponent(edicao.organizador)}`) #{edicao.organizador}
+                  else
+                    | N/A
+                td
+                  if edicao.vencedor
+                    a.w3-text-indigo(href=`/paises/${encodeURIComponent(edicao.vencedor)}`) #{edicao.vencedor}
+                  else
+                    | N/A

@@ -1,0 +1,59 @@
+doctype html
+html(lang="pt")
+  head
+    meta(charset="UTF-8")
+    meta(name="viewport", content="width=device-width, initial-scale=1.0")
+    title País: #{pais}
+    link(rel="stylesheet", href="/stylesheets/style.css")
+  body
+    .w3-container.w3-indigo
+      h1.w3-center #{pais} no Eurovision
+      .w3-center
+        a.w3-button.w3-white.w3-text-indigo.w3-hover-light-blue(href="/") ← Voltar à página principal
+
+    .w3-container.w3-margin-top
+      h2.w3-text-indigo Participações de #{pais}
+      
+      if participacoes && participacoes.length > 0
+        table.w3-table-all.w3-hoverable.w3-card.w3-margin-bottom
+          thead
+            tr.w3-indigo
+              th ID Edição
+              th Ano
+              th Música
+              th Intérprete
+              th Vencedor
+          tbody
+            each part in participacoes
+              tr
+                td
+                  a.w3-text-indigo(href=`/${part.id}`) #{part.id}
+                td #{part.ano || 'N/A'}
+                td #{part.titulo || 'N/A'}
+                td #{part.interprete || 'N/A'}
+                td
+                  if part.vencedor
+                    span.w3-tag.w3-round.w3-green Sim
+                  else
+                    span.w3-tag.w3-round.w3-light-grey Não
+      else
+        .w3-panel.w3-pale-yellow
+          p Não há registos de participações deste país.
+
+      h2.w3-text-indigo Edições organizadas por #{pais}
+      
+      if organizadas && organizadas.length > 0
+        table.w3-table-all.w3-hoverable.w3-card
+          thead
+            tr.w3-indigo
+              th ID Edição
+              th Ano
+          tbody
+            each org in organizadas
+              tr
+                td
+                  a.w3-text-indigo(href=`/${org.id}`) #{org.id}
+                td #{org.anoEdição || org.ano || 'N/A'}
+      else
+        .w3-panel.w3-pale-yellow
+          p Não há registos de edições organizadas por este país.
