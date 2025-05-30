@@ -13,9 +13,9 @@ O projeto utiliza MongoDB como sistema de gerenciamento de base de dados. A pers
 O modelo de dados é intencionalmente flexível para acomodar a estrutura variável dos dados do Eurovision ao longo dos anos:
 
 ```js
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 const edicaoSchema = new mongoose.Schema({}, { strict: false });
-module.exports = mongoose.model('Edicao', edicaoSchema, 'edicoes');
+module.exports = mongoose.model("Edicao", edicaoSchema, "edicoes");
 ```
 
 ## Preparação e Importação de Dados
@@ -25,11 +25,11 @@ module.exports = mongoose.model('Edicao', edicaoSchema, 'edicoes');
 O processo começou com a limpeza dos dados usando um script Python:
 
 ```bash
-python3 /home/diogo/Desktop/Projetos/ENGWEB2025-Normal/datasets/clean_up.py
+python3 ./datasets/clean_up.py
 ```
 
 Este script processou os dados brutos e gerou dois ficheiros:
-- `dataset_limpo.json` - Uma versão limpa dos dados originais
+
 - `dataset_array.json` - Uma versão formatada como array JSON para importação
 
 O script identificou 65 edições do Eurovision com anos desde 1956 até ao presente.
@@ -37,19 +37,23 @@ O script identificou 65 edições do Eurovision com anos desde 1956 até ao pres
 ### Setup da Base de Dados MongoDB
 
 1. Criação do container MongoDB:
+
    ```bash
    docker run -d --name mongo-eurovisao -p 27017:27017 mongo
    ```
 
 2. Cópia do dataset para o container:
+
    ```bash
    docker cp dataset_array.json mongo-eurovisao:/dataset_array.json
    ```
 
 3. Importação dos dados usando mongoimport:
+
    ```bash
    docker exec -it mongo-eurovisao mongoimport -d eurovisao -c edicoes --file /dataset_array.json --jsonArray
    ```
+
    Resultado: `65 document(s) imported successfully. 0 document(s) failed to import.`
 
 4. Verificação da importação através do console MongoDB:
@@ -63,48 +67,56 @@ O script identificou 65 edições do Eurovision com anos desde 1956 até ao pres
 As seguintes queries foram desenvolvidas para analisar os dados do Eurovision (`ex1/queries.txt`):
 
 1. **Contagem total de registos na base de dados**:
+
    ```javascript
-   db.edicoes.countDocuments()
+   db.edicoes.countDocuments();
    ```
 
 2. **Contagem de edições vencidas pela Irlanda**:
+
    ```javascript
-   db.edicoes.countDocuments({"vencedor": "Ireland"})
+   db.edicoes.countDocuments({ vencedor: "Ireland" });
    ```
 
 3. **Lista de intérpretes ordenada alfabeticamente (sem repetições)**:
+
    ```javascript
    db.edicoes.aggregate([
      { $unwind: "$musicas" },
      { $group: { _id: "$musicas.intérprete" } },
      { $match: { _id: { $ne: null } } },
      { $sort: { _id: 1 } },
-     { $project: { _id: 0, interprete: "$_id" } }
-   ])
+     { $project: { _id: 0, interprete: "$_id" } },
+   ]);
    ```
 
 4. **Distribuição de músicas por edição**:
+
    ```javascript
    db.edicoes.aggregate([
-     { $project: { 
-         id: 1, 
-         ano: 1, 
-         numeroMusicas: { $size: { $ifNull: ["$musicas", []] } } 
-     }},
-     { $sort: { ano: 1 } }
-   ])
+     {
+       $project: {
+         id: 1,
+         ano: 1,
+         numeroMusicas: { $size: { $ifNull: ["$musicas", []] } },
+       },
+     },
+     { $sort: { ano: 1 } },
+   ]);
    ```
 
 5. **Distribuição de vitórias por país**:
    ```javascript
    db.edicoes.aggregate([
      { $match: { vencedor: { $exists: true, $ne: null } } },
-     { $group: { 
-         _id: "$vencedor", 
-         numeroVitorias: { $sum: 1 } 
-     }},
-     { $sort: { numeroVitorias: -1 } }
-   ])
+     {
+       $group: {
+         _id: "$vencedor",
+         numeroVitorias: { $sum: 1 },
+       },
+     },
+     { $sort: { numeroVitorias: -1 } },
+   ]);
    ```
 
 ## Estrutura do Projeto
@@ -153,6 +165,7 @@ A interface web estará disponível em http://localhost:25001.
 ## Verificação da Instalação
 
 1. Para verificar a API:
+
    - http://localhost:25000/edicoes (lista todas as edições)
    - http://localhost:25000/paises?papel=org (lista países organizadores)
    - http://localhost:25000/paises?papel=venc (lista países vencedores)
